@@ -7,10 +7,20 @@ import cookieParser from "cookie-parser";
 import * as dotenv from "dotenv";
 
 import routes from "./routes";
+import { connect } from "mongoose";
 
 dotenv.config();
 
 const app = express();
+
+async function connectToDB() {
+  await connect(process.env.MONGO_URI as string).then(() => {
+    console.log("Connected to DB");
+  });
+}
+
+connectToDB();
+
 
 app.use(helmet());
 app.use(morgan("dev"));
