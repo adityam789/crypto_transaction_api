@@ -81,6 +81,7 @@ export default class AuthController {
 			password_hash: hashedPassword,
 		});
 		
+		await userModel.save();
 
     return res.json({
       success: true,
