@@ -21,15 +21,15 @@ export default class AuthController {
       });
     }
 
-    if (!user.email_verified) {
+    if (!user.comparePassword(password)) {
       return res.status(401).json({
-        message: "Email not verified",
+        message: "Invalid email or password",
       });
     }
 
-    if (!compareSync(password, user.password_hash)) {
+    if (!user.email_verified) {
       return res.status(401).json({
-        message: "Invalid email or password",
+        message: "Email not verified",
       });
     }
 
@@ -88,14 +88,12 @@ export default class AuthController {
       });
     }
 
-    const hashedPassword = hashSync(password, 10);
-
     const userModel = new UserModel({
       email,
-      password_hash: hashedPassword,
+      password_hash: hashSync(password, 10),
     });
 
-    await userModel.save({});
+    await userModel.save();
 
     const verification = new VerificationModel({
       user: userModel._id,

@@ -1,11 +1,13 @@
 import { Document, model, Schema } from "mongoose";
+import { compareSync, hashSync } from "bcrypt";
 
-interface User extends Document {
+export interface User extends Document {
   email: string;
   password_hash: string;
   created_at: Date;
   updated_at: Date;
   email_verified: boolean;
+  comparePassword(password: string): boolean;
 }
 
 const UserSchema = new Schema<User>({
@@ -32,6 +34,12 @@ const UserSchema = new Schema<User>({
     default: false,
   },
 });
+
+UserSchema.methods.comparePassword = function (password: string){
+  const user = this as User;
+  const isMatch = compareSync(password, user.password_hash);
+  return isMatch;
+}
 
 const UserModel = model<User>("User", UserSchema);
 
