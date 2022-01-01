@@ -3,9 +3,10 @@ import axios from "axios";
 const url = "https://api.pro.coinbase.com";
 
 export default class PricingService {
-  public getPricingFromCoinbase(spot: string, date?: string) {
+  public getPricingFromCoinbase(coin1: string, coin2:string, date?: string) {
+    const coinpair: string = [coin1, coin2].join("-");
     return axios
-      .get(`https://api.coinbase.com/v2/prices/${spot}/spot`, {
+      .get(`https://api.coinbase.com/v2/prices/${coinpair}/spot`, {
         params: { date },
       })
       .then((response) => response.data.data)

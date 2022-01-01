@@ -1,41 +1,98 @@
 import WalletService from "./wallet.service";
 import PricingService from "./pricing.service";
-// import WalletModel from "../models/Wallet.model";
+import TransactionService from "./transaction.service";
+import WalletModel from "../models/Wallet.model";
 
-export default class TransactionService {
+export default class ExchangeService {
   walletService: WalletService = new WalletService();
   pricingService: PricingService = new PricingService();
+  transactionService: TransactionService = new TransactionService();
 
   public async buy(
-    wallet_id_with: string,
+    coin_to_sell: string,
     coin_to_buy: string,
     amount: number,
+    wallet_id_with: string,
     wallet_id_to?: string
   ) {
-    const price = await this.pricingService.getPricingFromCoinbase(coin_to_buy);
-    this.walletService.withdrawFund(wallet_id_with, amount * price);
     if (!wallet_id_to) {
-      wallet_id_to = await this.walletService.createWallet(
+      const wallet_to = await this.walletService.createWallet(
         wallet_id_with,
         coin_to_buy
       );
+      wallet_id_to = wallet_to._id as string;
     }
-    // @ts-ignore
-    this.walletService.depositFund(wallet_id_to, amount);
-    //this.walletService.createWallet(user_id, coin_to_buy, amount);
+    const wallet_to = await WalletModel.findById(wallet_id_to);
+    const wallet_from = await WalletModel.findById(wallet_id_with);
+    if (!wallet_to || !wallet_from) {
+      throw new Error("Wallet not found");
+    }
+    if (
+      wallet_to.currency !== coin_to_buy ||
+      wallet_from.currency !== coin_to_sell
+    ) {
+      throw new Error("Invalid currency");
+    }
+    const price = await this.pricingService.getPricingFromCoinbase(
+      coin_to_buy,
+      coin_to_sell
+    );
+    this.walletService.withdrawFundWithoutTransaction(
+      wallet_id_with,
+      amount * price
+    );
+    this.walletService.depositFundWithoutTransaction(wallet_id_to, amount);
+    const transaction = await this.transactionService.create(
+      wallet_from.id,
+      wallet_to.id,
+      coin_to_sell,
+      coin_to_buy,
+      amount,
+      amount * price
+    );
+    return transaction;
   }
 
   public async sell(
-    wallet_id_with: string,
-    wallet_id_to: string,
+    coin_to_recieve: string,
     coin_to_sell: string,
-    amount: number
+    amount: number,
+    wallet_id_with: string,
+    wallet_id_to?: string
   ) {
+    if (!wallet_id_to) {
+      const wallet_to = await this.walletService.createWallet(
+        wallet_id_with,
+        coin_to_recieve
+      );
+      wallet_id_to = wallet_to._id as string;
+    }
+    const wallet_to = await WalletModel.findById(wallet_id_to);
+    const wallet_from = await WalletModel.findById(wallet_id_with);
+    if (!wallet_to || !wallet_from) {
+      throw new Error("Wallet not found");
+    }
+    if (
+      wallet_to.currency !== coin_to_recieve ||
+      wallet_from.currency !== coin_to_sell
+    ) {
+      throw new Error("Invalid currency");
+    }
     const price = await this.pricingService.getPricingFromCoinbase(
-      coin_to_sell
+      coin_to_sell,
+      coin_to_recieve
     );
-    this.walletService.withdrawFund(wallet_id_with, amount);
-    this.walletService.depositFund(wallet_id_to, amount * price);
-    //this.walletService.createWallet(user_id, coin_to_sell, amount * price);
+    this.walletService.withdrawFundWithoutTransaction(wallet_id_with, amount);
+    
+    this.walletService.depositFundWithoutTransaction(wallet_id_to, amount * price);
+    const transaction = await this.transactionService.create(
+      wallet_from.id,
+      wallet_to.id,
+      coin_to_sell,
+      coin_to_recieve,
+      amount,
+      amount * price
+    );
+    return transaction;
   }
 }

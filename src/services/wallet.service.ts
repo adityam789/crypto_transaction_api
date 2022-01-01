@@ -1,7 +1,10 @@
 import WalletModel from "../models/Wallet.model";
+import TransactionService from "./transaction.service";
+
+const transactionService = new TransactionService();
 
 export default class WalletService {
-  public async depositFund(wallet_id: string, amount: number) {
+  public async depositFundWithoutTransaction(wallet_id: string, amount: number) {
     const wallet = await WalletModel.findById(wallet_id);
     if (!wallet) {
       throw new Error("Wallet not found");
@@ -9,6 +12,12 @@ export default class WalletService {
     wallet.balance += amount;
     wallet.updated_at = new Date();
     await wallet.save();
+    return wallet;
+  }
+  public async depositFund(wallet_id: string, amount: number) {
+    const wallet = await this.depositFundWithoutTransaction(wallet_id, amount);
+    const transaction = await transactionService.create("deposit", wallet_id, wallet.currency, wallet.currency, amount, amount);
+    return transaction;
   }
   public async createWallet(
     user_id: string,
@@ -22,9 +31,9 @@ export default class WalletService {
     });
 
     await wallet.save();
-    return wallet._id;
+    return wallet;
   }
-  public async withdrawFund(wallet_id: string, amount: number) {
+  public async withdrawFundWithoutTransaction(wallet_id: string, amount: number) {
     const wallet = await WalletModel.findById(wallet_id);
     if (!wallet) {
       throw new Error("Wallet not found");
@@ -35,6 +44,12 @@ export default class WalletService {
     wallet.balance -= amount;
     wallet.updated_at = new Date();
     await wallet.save();
+    return wallet;
+  }
+  public async withdrawFund(wallet_id: string, amount: number) {
+    const wallet = await this.withdrawFundWithoutTransaction(wallet_id, amount);
+    const transaction = await transactionService.create(wallet_id, "withdraw", wallet.currency, wallet.currency, amount, amount);
+    return transaction;
   }
   public async getAll(user_id: string) {
     const wallets = await WalletModel.find({ user_id });
@@ -63,5 +78,14 @@ export default class WalletService {
     wallet_to.updated_at = new Date();
     await wallet_from.save();
     await wallet_to.save();
+    const transaction = await transactionService.create( 
+      wallet_id_from,
+      wallet_id_to,
+      wallet_from.currency,
+      wallet_to.currency,
+      amount,
+      amount
+    );
+    return transaction;
   }
 }
