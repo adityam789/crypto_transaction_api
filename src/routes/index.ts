@@ -8,13 +8,13 @@ import pricingRoutes from "./pricing.routes";
 const routes = Router();
 
 routes.use((req: Request, res: Response, next: NextFunction) => {
-	res.header("Access-Control-Allow-Origin", "*");
-	res.header(
-		"Access-Control-Allow-Headers",
-		"Origin, X-Requested-With, Content-Type, Accept, Authorization"
-	);
-	next();
-})
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+  );
+  next();
+});
 
 routes.use("/transactions", transactionRoutes);
 routes.use("/auth", authRoutes);

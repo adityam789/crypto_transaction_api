@@ -97,21 +97,21 @@ export default class AuthController {
 
     await userModel.save({});
 
-		const verification = new VerificationModel({
-			user: userModel._id,
-		});
+    const verification = new VerificationModel({
+      user: userModel._id,
+    });
 
-		await verification.save();
+    await verification.save();
 
-		const msg:any= {
-			to: email,
-			from: process.env.EMAIL_FROM,
-			subject: "Email verification",
-			text: `Please verify your email by clicking on the following link: http://localhost:3000/auth/verify/${verification.verification_token}`,
-			html: `<p>Please verify your email by clicking on the following link:</p><p><a href="http://localhost:3000/auth/verify/${verification.verification_token}">http://localhost:3000/api/auth/verify/${verification.verification_token}</a></p>`,
-		};
+    const msg: any = {
+      to: email,
+      from: process.env.EMAIL_FROM,
+      subject: "Email verification",
+      text: `Please verify your email by clicking on the following link: http://localhost:3000/auth/verify/${verification.verification_token}`,
+      html: `<p>Please verify your email by clicking on the following link:</p><p><a href="http://localhost:3000/auth/verify/${verification.verification_token}">http://localhost:3000/api/auth/verify/${verification.verification_token}</a></p>`,
+    };
 
-		await sgMail.send(msg);
+    await sgMail.send(msg);
 
     return res.json({
       success: true,
@@ -119,31 +119,33 @@ export default class AuthController {
     });
   }
 
-	public async verify(req: Request, res: Response, next: NextFunction) {
-		const { token } = req.params;
+  public async verify(req: Request, res: Response, next: NextFunction) {
+    const { token } = req.params;
 
-		const verification = await VerificationModel.findOne({ verification_token: token });
+    const verification = await VerificationModel.findOne({
+      verification_token: token,
+    });
 
-		if (!verification) {
-			return res.status(401).json({
-				message: "Invalid token",
-			});
-		}
+    if (!verification) {
+      return res.status(401).json({
+        message: "Invalid token",
+      });
+    }
 
-		const user = await UserModel.findOne({ _id: verification.user });
-		
-		if (!user) {
-			return res.status(401).json({
-				message: "User not found",
-			});
-		}
+    const user = await UserModel.findOne({ _id: verification.user });
 
-		user.email_verified = true;
-		await user.save();
+    if (!user) {
+      return res.status(401).json({
+        message: "User not found",
+      });
+    }
 
-		return res.json({
-			success: true,
-			message: "Email verified successfully.",
-		});
-	}
+    user.email_verified = true;
+    await user.save();
+
+    return res.json({
+      success: true,
+      message: "Email verified successfully.",
+    });
+  }
 }

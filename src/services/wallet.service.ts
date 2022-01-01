@@ -44,7 +44,11 @@ export default class WalletService {
     const wallets = await WalletModel.find({ user_id, currency });
     return wallets;
   }
-  public async exchangeBetweenWallet(wallet_id_from: string, wallet_id_to: string, amount: number) {
+  public async exchangeBetweenWallet(
+    wallet_id_from: string,
+    wallet_id_to: string,
+    amount: number
+  ) {
     const wallet_from = await WalletModel.findById(wallet_id_from);
     const wallet_to = await WalletModel.findById(wallet_id_to);
     if (!wallet_from || !wallet_to) {

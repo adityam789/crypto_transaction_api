@@ -5,7 +5,6 @@ import PricingService from "../services/pricing.service";
 const pricingService = new PricingService();
 
 export default class PricingController {
-
   public getPricing(req: Request, res: Response, next: NextFunction) {
     const spot = req.params.spot;
     console.log(spot);
@@ -26,5 +25,4 @@ export default class PricingController {
       .then((data) => res.json(data))
       .catch(next);
   }
-
 }
