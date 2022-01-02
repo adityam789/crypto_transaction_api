@@ -15,42 +15,50 @@ export default class ExchangeService {
     wallet_id_with: string,
     wallet_id_to?: string
   ) {
-    if (!wallet_id_to) {
-      const wallet_to = await this.walletService.createWallet(
-        wallet_id_with,
-        coin_to_buy
+    try{
+      if (!wallet_id_to) {
+        const wallet_to = await this.walletService.createWallet(
+          wallet_id_with,
+          coin_to_buy
+        );
+        wallet_id_to = wallet_to._id.toString() as string;
+      }
+      const wallet_to = await WalletModel.findById(wallet_id_to);
+      const wallet_from = await WalletModel.findById(wallet_id_with);
+      if (!wallet_to || !wallet_from) {
+        throw new Error("Wallet not found");
+      }
+      if (
+        wallet_to.currency !== coin_to_buy ||
+        wallet_from.currency !== coin_to_sell
+      ) {
+        throw new Error("Invalid currency");
+      }
+      const price = parseFloat(
+        (
+          await this.pricingService.getPricingFromCoinbase(
+            coin_to_buy,
+            coin_to_sell
+          )
+        ).amount
       );
-      wallet_id_to = wallet_to._id as string;
+      this.walletService.withdrawFundWithoutTransaction(
+        wallet_id_with,
+        amount * price
+      );
+      this.walletService.depositFundWithoutTransaction(wallet_id_to, amount);
+      const transaction = await this.transactionService.create(
+        wallet_from.id,
+        wallet_to.id,
+        coin_to_sell,
+        coin_to_buy,
+        amount,
+        amount * price
+      );
+      return transaction;
+    } catch(err:any){
+      throw err;
     }
-    const wallet_to = await WalletModel.findById(wallet_id_to);
-    const wallet_from = await WalletModel.findById(wallet_id_with);
-    if (!wallet_to || !wallet_from) {
-      throw new Error("Wallet not found");
-    }
-    if (
-      wallet_to.currency !== coin_to_buy ||
-      wallet_from.currency !== coin_to_sell
-    ) {
-      throw new Error("Invalid currency");
-    }
-    const price = await this.pricingService.getPricingFromCoinbase(
-      coin_to_buy,
-      coin_to_sell
-    );
-    this.walletService.withdrawFundWithoutTransaction(
-      wallet_id_with,
-      amount * price
-    );
-    this.walletService.depositFundWithoutTransaction(wallet_id_to, amount);
-    const transaction = await this.transactionService.create(
-      wallet_from.id,
-      wallet_to.id,
-      coin_to_sell,
-      coin_to_buy,
-      amount,
-      amount * price
-    );
-    return transaction;
   }
 
   public async sell(

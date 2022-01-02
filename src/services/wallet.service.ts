@@ -44,21 +44,28 @@ export default class WalletService {
     wallet_id: string,
     amount: number
   ) {
-    const wallet = await WalletModel.findById(wallet_id);
-    if (!wallet) {
-      throw new Error("Wallet not found");
+    try {
+      const wallet = await WalletModel.findById(wallet_id);
+      if (!wallet) {
+        throw new Error("Wallet not found");
+      }
+      if (wallet.balance < amount) {
+        throw new Error("Insufficient funds");
+      }
+      wallet.balance -= amount;
+      wallet.updated_at = new Date();
+      await wallet.save();
+      return wallet;
+    } catch (err) {
+      throw err;
     }
-    if (wallet.balance < amount) {
-      throw new Error("Insufficient funds");
-    }
-    wallet.balance -= amount;
-    wallet.updated_at = new Date();
-    await wallet.save();
-    return wallet;
   }
   public async withdrawFund(wallet_id: string, amount: number) {
-    try{
-      const wallet = await this.withdrawFundWithoutTransaction(wallet_id, amount);
+    try {
+      const wallet = await this.withdrawFundWithoutTransaction(
+        wallet_id,
+        amount
+      );
       const transaction = await transactionService.create(
         wallet_id,
         "withdraw",
@@ -68,8 +75,8 @@ export default class WalletService {
         amount
       );
       return transaction;
-    } catch (error:any) {
-      throw new Error(error);
+    } catch (error) {
+      throw error;
     }
   }
   public async getAll(user_id: string) {
@@ -97,7 +104,7 @@ export default class WalletService {
     if (!wallet_from || !wallet_to) {
       throw new Error("Wallet not found");
     }
-    if(wallet_from.currency !== wallet_to.currency){
+    if (wallet_from.currency !== wallet_to.currency) {
       throw new Error("Conflict-currency different");
     }
     if (wallet_from.balance < amount) {
