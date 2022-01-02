@@ -33,7 +33,7 @@ router.post("/deposit", walletController.depositFund);
  * @apiParam {String} wallet_id The wallet to withdraw from
  * @apiSuccess {Transaction} success Transaction object
  * @apiError {Object} error Error object
- */ 
+ */
 router.post("/withdraw", walletController.withdrawFund);
 
 export default router;

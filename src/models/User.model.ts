@@ -1,5 +1,5 @@
 import { Document, model, Schema } from "mongoose";
-import { compareSync, hashSync } from "bcrypt";
+import { compareSync } from "bcrypt";
 
 export interface User extends Document {
   email: string;

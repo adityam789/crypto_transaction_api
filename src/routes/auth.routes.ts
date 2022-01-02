@@ -1,4 +1,4 @@
-import { NextFunction, Router, Request, Response } from "express";
+import { Router } from "express";
 import AuthController from "../controllers/auth.controller";
 import passport from "passport";
 import { passport_token_handler } from "../controllers/passport.controller"

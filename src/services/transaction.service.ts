@@ -13,10 +13,10 @@ export default class TransactionService {
     const transaction = new TransactionModel({
       source_wallet_id: source,
       destination_wallet_id: destination,
-      coin_from: coin_from,
-      coin_to: coin_to,
-      source_amount: source_amount,
-      destination_amount: destination_amount,
+      coin_from,
+      coin_to,
+      source_amount,
+      destination_amount,
     });
     await transaction.save();
     return transaction;

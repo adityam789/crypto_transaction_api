@@ -1,5 +1,4 @@
 import passport from "passport";
-import { Strategy as LocalStrategy } from "passport-local";
 import { Strategy as JwtStrategy, ExtractJwt } from "passport-jwt";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { Strategy as DiscordStrategy } from "passport-discord";
@@ -67,7 +66,7 @@ passport.use(new GoogleStrategy({
         refresh_token: refreshToken,
         access_token: accessToken,
     });
-    await newUserAccount.save();   
+    await newUserAccount.save();
     return done(null, newUserAccount.user_id);
 }));
 

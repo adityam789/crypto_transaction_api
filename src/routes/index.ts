@@ -5,7 +5,6 @@ import authRoutes from "./auth.routes";
 import fundingRoutes from "./funding.routes";
 import pricingRoutes from "./pricing.routes";
 import router from "./exchange.routes";
-import userHandler from "../middleware/user.middleware";
 
 const routes = Router();
 
@@ -19,9 +18,14 @@ routes.use((req: Request, res: Response, next: NextFunction) => {
 });
 routes.use("/auth", authRoutes);
 
-router.use(userHandler);
 routes.use("/transactions", transactionRoutes);
 routes.use("/funding", fundingRoutes);
 routes.use("/pricing", pricingRoutes);
+
+routes.all("*",(req: Request, res: Response, next: NextFunction) => {
+  res.status(404).json({
+    message: "Route not found",
+  });
+})
 
 export default routes;

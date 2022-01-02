@@ -3,14 +3,23 @@ import axios from "axios";
 const url = "https://api.pro.coinbase.com";
 
 export default class PricingService {
-  public getPricingFromCoinbase(coin1: string, coin2: string, date?: string) {
+  public async getPricingFromCoinbase(
+    coin1: string,
+    coin2: string,
+    date?: string
+  ) {
     const coinpair: string = [coin1, coin2].join("-");
-    return axios
-      .get(`https://api.coinbase.com/v2/prices/${coinpair}/spot`, {
-        params: { date },
-      })
-      .then((response) => response.data.data)
-      .catch((error) => error.response.data);
+    try {
+      const response = await axios.get(
+        `https://api.coinbase.com/v2/prices/${coinpair}/spot`,
+        {
+          params: { date },
+        }
+      );
+      return response.data.data;
+    } catch (error: any) {
+      throw error.response.data;
+    }
   }
   public getCandlestickDataFromCoinbase(
     product_id: string,
@@ -19,10 +28,12 @@ export default class PricingService {
     granularity?: number
   ) {
     return axios
-      .get(`https://api.exchange.coinbase.com/products/${product_id}/candles`, {
+      .get(`https://api.pro.coinbase.com/products/${product_id}/candles`, {
         params: { start, end, granularity },
       })
-      .then((response) => response.data.data)
-      .catch((error) => error.response.data);
+      .then((res) => res.data)
+      .catch((error) => {
+        throw error.response.data;
+      });
   }
 }

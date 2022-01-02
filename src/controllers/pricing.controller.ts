@@ -13,17 +13,18 @@ export default class PricingController {
     pricingService
       .getPricingFromCoinbase(coin_1, coin_2)
       .then((pricing) => res.json(pricing))
-      .catch(next);
+      .catch((error) => res.status(400).json(error));
   }
 
   public getCandlestickData(req: Request, res: Response, next: NextFunction) {
     const product_id = req.params.product_id;
     const start = req.query.start as string;
     const end = req.query.end as string;
-    const granularity = parseInt(req.query.granularity as string);
+    const granularity = parseInt(req.query.granularity as string) || undefined;
+    console.log(start, end, granularity);
     pricingService
       .getCandlestickDataFromCoinbase(product_id, start, end, granularity)
       .then((data) => res.json(data))
-      .catch(next);
+      .catch((error) => res.status(400).json(error));
   }
 }

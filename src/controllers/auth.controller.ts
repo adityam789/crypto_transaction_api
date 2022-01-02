@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { compareSync, hashSync } from "bcrypt";
+import { hashSync } from "bcrypt";
 import { sign } from "jsonwebtoken";
 import UserModel from "../models/User.model";
 import VerificationModel from "../models/Verification.model";
@@ -58,7 +58,7 @@ export default class AuthController {
       });
     }
 
-    let passwordErrors: string[] = [];
+    const passwordErrors: string[] = [];
 
     if (password.length < 8) {
       passwordErrors.push("at least 8 characters");

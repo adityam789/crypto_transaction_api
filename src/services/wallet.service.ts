@@ -5,10 +5,10 @@ const transactionService = new TransactionService();
 
 export default class WalletService {
   public async depositFundWithoutTransaction(
-    wallet_id: string,
+    walletId: string,
     amount: number
   ) {
-    const wallet = await WalletModel.findById(wallet_id);
+    const wallet = await WalletModel.findById(walletId);
     if (!wallet) {
       throw new Error("Wallet not found");
     }
@@ -17,11 +17,11 @@ export default class WalletService {
     await wallet.save();
     return wallet;
   }
-  public async depositFund(wallet_id: string, amount: number) {
-    const wallet = await this.depositFundWithoutTransaction(wallet_id, amount);
+  public async depositFund(walletId: string, amount: number) {
+    const wallet = await this.depositFundWithoutTransaction(walletId, amount);
     const transaction = await transactionService.create(
       "deposit",
-      wallet_id,
+      walletId,
       wallet.currency,
       wallet.currency,
       amount,
