@@ -52,7 +52,10 @@ passport.use(
         userAccount.access_token = accessToken;
         userAccount.refresh_token = refreshToken;
         userAccount.save();
-        return done(null, userAccount.user_id);
+        return done(null, {
+          id: userAccount.user_id,
+          scopes: ["exchange", "profile", "funding", "wallet"],
+        });
       }
       let userProfile = await ProfileModel.findOne({
         email: profile._json.email,
@@ -76,7 +79,10 @@ passport.use(
         access_token: accessToken,
       });
       await newUserAccount.save();
-      return done(null, newUserAccount.user_id);
+      return done(null, {
+        id: newUserAccount.user_id,
+        scopes: ["exchange", "profile", "funding", "wallet"],
+      });
     }
   )
 );
@@ -100,7 +106,10 @@ passport.use(
         userAccount.access_token = accessToken;
         userAccount.refresh_token = refreshToken;
         userAccount.save();
-        return done(null, userAccount.user_id);
+        return done(null, {
+          id: userAccount.user_id,
+          scopes: ["exchange", "profile", "funding", "wallet"],
+        });
       }
       let userProfile = await ProfileModel.findOne({
         email: profile.email,
@@ -124,7 +133,10 @@ passport.use(
         access_token: accessToken,
       });
       await newUserAccount.save();
-      return done(null, newUserAccount.user_id);
+      return done(null, {
+        id: newUserAccount.user_id,
+        scopes: ["exchange", "profile", "funding", "wallet"],
+      });
     }
   )
 );
@@ -157,7 +169,10 @@ passport.use(
         return done(null, false);
       }
 
-      return done(null, userAccount.user_id);
+      return done(null, {
+        id: userAccount.user_id,
+        scopes: ["exchange", "profile", "funding", "wallet"],
+      });
     }
   )
 );
@@ -174,9 +189,12 @@ export function passport_token_handler(
       error: "Unauthorized",
     });
   }
+
+  const user = req.user as { id: string; scopes: string[] };
   const token = sign(
     {
-      id: req.user as string,
+      id: user.id,
+      scopes: user.scopes,
     },
     process.env.JWT_SECRET as string,
     {
