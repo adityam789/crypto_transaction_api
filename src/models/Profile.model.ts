@@ -29,6 +29,7 @@ const ProfileSchema = new Schema<Profile>({
   email_verified: {
     type: Boolean,
     required: true,
+    default: false,
   },
   photo: {
     type: String,

@@ -1,60 +1,25 @@
 import { Request, Response, NextFunction } from "express";
 import { hashSync } from "bcrypt";
-import { sign } from "jsonwebtoken";
-import UserModel from "../models/User.model";
 import VerificationModel from "../models/Verification.model";
 import sgMail from "@sendgrid/mail";
 
 import * as dotenv from "dotenv";
+import passport from "passport";
+import ProfileModel from "../models/Profile.model";
+import AccountModel from "../models/Account.model";
 dotenv.config();
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY as string);
 
 export default class AuthController {
-  public async login(req: Request, res: Response, next: NextFunction) {
-    const { email, password } = req.body;
-
-    const user = await UserModel.findOne({ email });
-    if (!user) {
-      return res.status(401).json({
-        message: "Invalid email or password",
-      });
-    }
-
-    if (!user.comparePassword(password)) {
-      return res.status(401).json({
-        message: "Invalid email or password",
-      });
-    }
-
-    if (!user.email_verified) {
-      return res.status(401).json({
-        message: "Email not verified",
-      });
-    }
-
-    const userToken = sign({ id: user._id }, process.env.JWT_SECRET as string, {
-      expiresIn: "24h",
-      algorithm: "HS256",
-      subject: "user",
-      issuer: "crypto-api",
-    });
-
-    return res.json({
-      success: true,
-      message: "Authentication successful.",
-      token: userToken,
-    });
-  }
-
   public async register(req: Request, res: Response, next: NextFunction) {
-    const { email, password } = req.body;
+    const { name, email, password } = req.body;
 
-    const user = await UserModel.findOne({ email });
+    const profile = await ProfileModel.findOne({ email });
 
-    if (user) {
+    if (profile) {
       return res.status(409).json({
-        message: "User already exists.",
+        message: "Email already exists",
       });
     }
 
@@ -88,15 +53,27 @@ export default class AuthController {
       });
     }
 
-    const userModel = new UserModel({
+    const newProfile = new ProfileModel({
       email,
-      password_hash: hashSync(password, 10),
+      name,
+      email_verified: false,
     });
 
-    await userModel.save();
+    newProfile.save();
+
+    const newAccount = new AccountModel({
+      user_id: newProfile._id,
+      provider_type: "local",
+      provider_name: "local",
+      provider_account_id: newProfile._id,
+      refresh_token: "",
+      access_token: hashSync(password, 10),
+    });
+
+    newAccount.save();
 
     const verification = new VerificationModel({
-      user: userModel._id,
+      user: newProfile._id,
     });
 
     await verification.save();
@@ -130,7 +107,7 @@ export default class AuthController {
       });
     }
 
-    const user = await UserModel.findOne({ _id: verification.user });
+    const user = await ProfileModel.findById(verification.user);
 
     if (!user) {
       return res.status(401).json({

@@ -7,7 +7,11 @@ const router = Router();
 
 const authController = new AuthController();
 
-router.post("/login", authController.login);
+router.post(
+  "/login",
+  passport.authenticate("local", { session: false }),
+  passport_token_handler
+);
 router.post("/register", authController.register);
 
 router.get("/verify/:token", authController.verify);
