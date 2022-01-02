@@ -2,7 +2,6 @@ import { NextFunction, Request, Response, Router } from "express";
 
 import authRoutes from "./auth.routes";
 import exchangeRoutes from "./exchange.routes";
-import fundingRoutes from "./funding.routes";
 import pricingRoutes from "./pricing.routes";
 import profileRoutes from "./profile.routes";
 import walletRoutes from "./wallet.routes";
@@ -19,7 +18,6 @@ routes.use((req: Request, res: Response, next: NextFunction) => {
 });
 routes.use("/auth", authRoutes);
 routes.use("/exchange", exchangeRoutes);
-routes.use("/funding", fundingRoutes);
 routes.use("/pricing", pricingRoutes);
 routes.use("/profile", profileRoutes);
 routes.use("/wallet", walletRoutes);
