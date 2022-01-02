@@ -1,6 +1,6 @@
 import { Document, model, Schema } from "mongoose";
 
-interface Account extends Document {
+export interface Account extends Document {
     user_id: string;
     provider_type: string;
     provider_name: string;

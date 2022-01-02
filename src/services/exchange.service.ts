@@ -7,7 +7,7 @@ export default class ExchangeService {
   walletService: WalletService = new WalletService();
   pricingService: PricingService = new PricingService();
   transactionService: TransactionService = new TransactionService();
-
+  
   public async buy(
     coin_to_sell: string,
     coin_to_buy: string,

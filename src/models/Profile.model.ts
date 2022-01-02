@@ -1,6 +1,6 @@
 import { Document, model, Schema } from "mongoose";
 
-interface Profile extends Document {
+export interface Profile extends Document {
     name: string,
     email: string,
     created_at: Date,
