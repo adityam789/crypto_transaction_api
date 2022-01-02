@@ -9,6 +9,8 @@ import * as dotenv from "dotenv";
 
 import routes from "./routes";
 import { connect } from "mongoose";
+import sgMail from "@sendgrid/mail";
+sgMail.setApiKey(process.env.SENDGRID_API_KEY as string);
 
 dotenv.config();
 

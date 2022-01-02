@@ -4,6 +4,7 @@ import crypto from "crypto";
 interface Verification extends Document {
   user: ObjectId;
   verification_token: string;
+  type: string;
   created_at: Date;
   updated_at: Date;
 }
@@ -22,6 +23,10 @@ const VerificationSchema = new Schema<Verification>({
     type: String,
     required: true,
     default: randomToken(),
+  },
+  type: {
+    type: String,
+    required: true,
   },
   created_at: {
     type: Date,

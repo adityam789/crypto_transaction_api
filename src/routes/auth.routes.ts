@@ -16,6 +16,9 @@ router.post("/register", authController.register);
 
 router.get("/verify/:token", authController.verify);
 
+router.post("/forgot", authController.forgotPassword);
+router.post("/reset/:token", authController.resetPassword);
+
 router.get(
   "/google",
   passport.authenticate("google", {
