@@ -151,7 +151,7 @@ export default class AuthController {
       from: process.env.EMAIL_FROM,
       subject: "Password reset",
       text: `Please reset your password by clicking on the following link: http://localhost:3000/auth/reset/${verification.verification_token}`,
-      html: `<p>Please reset your password by clicking on the following link:</p><p><a href="http://localhost:3000/auth/reset/${verification.verification_token}">http://localhost:3000/api/auth/reset/${verification.verification_token}</a></p>`,
+      html: `<p>Please reset your password by clicking on the following link:</p><p><a href="http://localhost:3000/auth/reset/${verification.verification_token}">http://localhost:3000/auth/reset/${verification.verification_token}</a></p>`,
     };
 
     await sgMail.send(msg);
@@ -164,6 +164,7 @@ export default class AuthController {
 
   public async resetPassword(req: Request, res: Response, next: NextFunction) {
     const { token } = req.params;
+    const { password } = req.body;
 
     const verification = await VerificationModel.findOne({
       verification_token: token,
@@ -174,31 +175,11 @@ export default class AuthController {
         message: "Invalid token",
       });
     }
-
-    const user = await AccountModel.findOne({
-      user_id: verification.user,
-      provider_type: "local",
-    });
-
-    if (!user) {
-      const newAccount = new AccountModel({
-        user_id: verification.user,
-        provider_type: "local",
-        provider_name: "local",
-        provider_account_id: verification.user,
-        refresh_token: "",
-        access_token: hashSync(req.body.password, 10),
-      });
-
-      newAccount.save();
-
-      return res.json({
-        success: true,
-        message: "Password reset successfully.",
+    if (!password) {
+      return res.status(400).json({
+        message: "Password is required",
       });
     }
-
-    const { password } = req.body;
 
     const passwordErrors: string[] = [];
 
@@ -227,6 +208,29 @@ export default class AuthController {
         success: false,
         message:
           "Password must contain the following: " + passwordErrors.join(", "),
+      });
+    }
+
+    const user = await AccountModel.findOne({
+      user_id: verification.user,
+      provider_type: "local",
+    });
+
+    if (!user) {
+      const newAccount = new AccountModel({
+        user_id: verification.user,
+        provider_type: "local",
+        provider_name: "local",
+        provider_account_id: verification.user,
+        refresh_token: "",
+        access_token: hashSync(password, 10),
+      });
+
+      newAccount.save();
+
+      return res.json({
+        success: true,
+        message: "Password reset successfully.",
       });
     }
 
