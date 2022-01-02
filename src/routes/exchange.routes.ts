@@ -1,9 +1,12 @@
 import { Router } from "express";
+import passport from "passport";
 import ExchangeController from "../controllers/exchange.controller";
 
 const router = Router();
 
 const exchangeController = new ExchangeController();
+
+router.use(passport.authenticate("jwt", { session: false }));
 
 /**
  * @api {post} /exchange/buy Buy
@@ -21,7 +24,6 @@ const exchangeController = new ExchangeController();
  * @apiError {Object} error Error object
  */
 router.post("/buy", exchangeController.buyOrder);
-
 
 /**
  * @api {post} /exchange/sell Sell

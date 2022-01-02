@@ -8,20 +8,30 @@ export default class WalletController {
   async depositFund(req: Request, res: Response, next: NextFunction) {
     try {
       const { amount, wallet_id } = req.body;
+      if (!amount) {
+        return res.status(400).json({
+          message: "Amount is required",
+        });
+      }
+      if (!wallet_id) {
+        return res.status(400).json({
+          message: "Wallet id is required",
+        });
+      }
       const user = JSON.parse(req.user as string) as Profile;
       const wallet = await this.walletService.getById(wallet_id);
       if (!wallet) {
         return res.status(404).json({
           success: false,
           message: "Wallet not found",
-        })
+        });
       }
 
       if (wallet.user_id !== user._id) {
         return res.status(401).json({
           success: false,
           message: "WARNING: This wallet is not yours",
-        })
+        });
       }
 
       const result = await this.walletService.depositFund(wallet._id, amount);
@@ -40,14 +50,14 @@ export default class WalletController {
         return res.status(404).json({
           success: false,
           message: "Wallet not found",
-        })
+        });
       }
 
       if (wallet.user_id !== user._id) {
         return res.status(401).json({
           success: false,
           message: "WARNING: This wallet is not yours",
-        })
+        });
       }
 
       const result = await this.walletService.withdrawFund(wallet._id, amount);

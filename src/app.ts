@@ -24,7 +24,7 @@ connectToDB();
 
 app.use(helmet());
 app.use(morgan("dev"));
-app.use(express.json({ limit: "10mb" }));
+app.use(express.json());
 app.use(cookieParser(process.env.COOKIE_SECRET));
 app.use(express.urlencoded({ extended: true }));
 app.use(passport.initialize());

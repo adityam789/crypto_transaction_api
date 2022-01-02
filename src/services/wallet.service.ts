@@ -4,10 +4,7 @@ import TransactionService from "./transaction.service";
 const transactionService = new TransactionService();
 
 export default class WalletService {
-  public async depositFundWithoutTransaction(
-    walletId: string,
-    amount: number
-  ) {
+  public async depositFundWithoutTransaction(walletId: string, amount: number) {
     const wallet = await WalletModel.findById(walletId);
     if (!wallet) {
       throw new Error("Wallet not found");

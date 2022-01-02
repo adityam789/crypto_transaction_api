@@ -1,16 +1,11 @@
 import { NextFunction, Router, Request, Response } from "express";
+import passport from "passport";
 import WalletController from "../controllers/wallet.controller";
 
 const router = Router();
 const walletController = new WalletController();
 
-router.all("*", (req: Request, res: Response, next: NextFunction) => {
-	if(!req.user) {
-		res.status(401).send("Unauthorized");
-	}
-	next();
-})
-
+router.use(passport.authenticate("jwt", { session: false }));
 
 /**
  * @api {post} /wallet/deposit Deposit
