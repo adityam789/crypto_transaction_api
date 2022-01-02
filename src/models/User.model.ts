@@ -35,11 +35,11 @@ const UserSchema = new Schema<User>({
   },
 });
 
-UserSchema.methods.comparePassword = function (password: string){
+UserSchema.methods.comparePassword = function (password: string) {
   const user = this as User;
   const isMatch = compareSync(password, user.password_hash);
   return isMatch;
-}
+};
 
 const UserModel = model<User>("User", UserSchema);
 

@@ -83,8 +83,11 @@ export default class ExchangeService {
       coin_to_recieve
     );
     this.walletService.withdrawFundWithoutTransaction(wallet_id_with, amount);
-    
-    this.walletService.depositFundWithoutTransaction(wallet_id_to, amount * price);
+
+    this.walletService.depositFundWithoutTransaction(
+      wallet_id_to,
+      amount * price
+    );
     const transaction = await this.transactionService.create(
       wallet_from.id,
       wallet_to.id,

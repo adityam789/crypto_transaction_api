@@ -7,7 +7,7 @@ const pricingService = new PricingService();
 export default class PricingController {
   public getPricing(req: Request, res: Response, next: NextFunction) {
     const coin_pair = req.params.coin_pair;
-    
+
     const [coin_1, coin_2] = coin_pair.split("-");
 
     pricingService

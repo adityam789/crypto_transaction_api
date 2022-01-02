@@ -19,7 +19,7 @@ routes.use((req: Request, res: Response, next: NextFunction) => {
 });
 routes.use("/auth", authRoutes);
 
-router.use(userHandler)
+router.use(userHandler);
 routes.use("/transactions", transactionRoutes);
 routes.use("/funding", fundingRoutes);
 routes.use("/pricing", pricingRoutes);
