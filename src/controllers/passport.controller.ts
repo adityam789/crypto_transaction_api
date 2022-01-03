@@ -15,6 +15,8 @@ import ApiKeyModel from "../models/ApiKey.model";
 
 dotenv.config();
 
+const REDIRECT_URI = process.env.NODE_ENV === "production"? `https://${process.env.BASE_URL}`:`http://localhost:3000`;
+
 passport.use(
   new JwtStrategy(
     {
@@ -40,7 +42,7 @@ passport.use(
     {
       clientID: process.env.GOOGLE_OAUTH_CLIENT_ID as string,
       clientSecret: process.env.GOOGLE_OAUTH_CLIENT_SECRET as string,
-      callbackURL: "/auth/google/callback",
+      callbackURL: `${REDIRECT_URI}/auth/google/callback`,
       scope: ["profile", "email"],
     },
     async (accessToken, refreshToken, profile, done) => {
@@ -95,7 +97,7 @@ passport.use(
     {
       clientID: process.env.DISCORD_OAUTH_CLIENT_ID as string,
       clientSecret: process.env.DISCORD_OAUTH_CLIENT_SECRET as string,
-      callbackURL: "/auth/discord/callback",
+      callbackURL: `${REDIRECT_URI}/auth/discord/callback`,
       scope: ["identify", "email"],
     },
     async (accessToken, refreshToken, profile, done) => {
