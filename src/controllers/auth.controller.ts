@@ -12,6 +12,10 @@ const BASE_URL = process.env.BASE_URL as string || "http://localhost:3000";
 const EMAIL_PORT = (process.env.PORT === "80"|| process.env.PORT === "443") ? "" : `:${process.env.PORT}` || ":3000";
 const SECURE_PROTOCOL = process.env.PORT === "443" ? "https" : "http";
 
+const URL = process.env.NODE_ENV==="production"?`https://${BASE_URL}`:`${SECURE_PROTOCOL}://${process.env.HOST || "localhost"}${EMAIL_PORT}`;
+
+
+
 sgMail.setApiKey(process.env.SENDGRID_API_KEY as string);
 
 export default class AuthController {
@@ -81,8 +85,8 @@ export default class AuthController {
       to: email,
       from: process.env.EMAIL_FROM,
       subject: "Email verification",
-      text: `Please verify your email by clicking on the following link: ${SECURE_PROTOCOL}://${BASE_URL}${EMAIL_PORT}/auth/verify/${verification.verification_token}`,
-      html: `<p>Please verify your email by clicking on the following link:</p><p><a href="${SECURE_PROTOCOL}://${BASE_URL}${EMAIL_PORT}/auth/verify/${verification.verification_token}">${SECURE_PROTOCOL}://${BASE_URL}${EMAIL_PORT}/auth/verify/${verification.verification_token}</a></p>`,
+      text: `Please verify your email by clicking on the following link: ${URL}/auth/verify/${verification.verification_token}`,
+      html: `<p>Please verify your email by clicking on the following link:</p><p><a href="${URL}/auth/verify/${verification.verification_token}">${URL}/auth/verify/${verification.verification_token}</a></p>`,
     };
     try {
       await sgMail.send(msg);
@@ -155,8 +159,8 @@ export default class AuthController {
       to: email,
       from: process.env.EMAIL_FROM,
       subject: "Password reset",
-      text: `Please reset your password by clicking on the following link: ${SECURE_PROTOCOL}://${BASE_URL}${EMAIL_PORT}/auth/reset/${verification.verification_token}`,
-      html: `<p>Please reset your password by clicking on the following link:</p><p><a href="${SECURE_PROTOCOL}://${BASE_URL}${EMAIL_PORT}/auth/reset/${verification.verification_token}">${SECURE_PROTOCOL}://${BASE_URL}${EMAIL_PORT}/auth/reset/${verification.verification_token}</a></p>`,
+      text: `Please reset your password by clicking on the following link: ${URL}/auth/reset/${verification.verification_token}`,
+      html: `<p>Please reset your password by clicking on the following link:</p><p><a href="${URL}/auth/reset/${verification.verification_token}">${SECURE_PROTOCOL}://${BASE_URL}${EMAIL_PORT}/auth/reset/${verification.verification_token}</a></p>`,
     };
 
     await sgMail.send(msg);
