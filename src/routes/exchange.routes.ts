@@ -42,6 +42,6 @@ router.post("/buy",scopeHandler("exchange.buy"), exchangeController.buyOrder);
  * @apiSuccess {Transaction} success Transaction object
  * @apiError {Object} error Error object
  */
-router.post("/sell", exchangeController.sellOrder);
+router.post("/sell",scopeHandler("exchange.sell"), exchangeController.sellOrder);
 
 export default router;
