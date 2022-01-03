@@ -5,6 +5,7 @@ import exchangeRoutes from "./exchange.routes";
 import pricingRoutes from "./pricing.routes";
 import profileRoutes from "./profile.routes";
 import walletRoutes from "./wallet.routes";
+import ApiKeyRoutes from "./ApiKey.routes";
 
 const routes = Router();
 
@@ -21,6 +22,7 @@ routes.use("/exchange", exchangeRoutes);
 routes.use("/pricing", pricingRoutes);
 routes.use("/profile", profileRoutes);
 routes.use("/wallet", walletRoutes);
+routes.use("/apikey", ApiKeyRoutes);
 
 routes.all("*", (req: Request, res: Response, next: NextFunction) => {
   res.status(404).json({

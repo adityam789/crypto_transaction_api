@@ -31,7 +31,7 @@ const VerificationSchema = new Schema<Verification>({
   created_at: {
     type: Date,
     default: new Date(Date.now()),
-    expires: "1m",
+    expires: "1h",
   },
   updated_at: {
     type: Date,

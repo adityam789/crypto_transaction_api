@@ -9,6 +9,7 @@ export interface Account extends Document {
   refresh_token: string;
   access_token: string;
   access_token_expires_at: Date;
+  scopes: string[];
   comparePassword(password: string): boolean;
 }
 

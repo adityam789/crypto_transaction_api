@@ -65,6 +65,7 @@ export default class AuthController {
       provider_account_id: newProfile._id,
       refresh_token: "",
       access_token: hashSync(password, 10),
+      scopes: ["exchange", "profile", "funding", "wallet", "apikey"]
     });
 
     const verification = new VerificationModel({
@@ -224,6 +225,7 @@ export default class AuthController {
         provider_account_id: verification.user,
         refresh_token: "",
         access_token: hashSync(password, 10),
+        scopes: ["exchange", "profile", "funding", "wallet", "apikey"]
       });
 
       newAccount.save();

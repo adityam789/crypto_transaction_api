@@ -3,6 +3,7 @@ import { Strategy as JwtStrategy, ExtractJwt } from "passport-jwt";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { Strategy as DiscordStrategy } from "passport-discord";
 import { Strategy as LocalStrategy } from "passport-local";
+import { Strategy as ApiKeyStrategy } from "passport-custom";
 
 import AccountModel from "../models/Account.model";
 import ProfileModel from "../models/Profile.model";
@@ -10,6 +11,7 @@ import ProfileModel from "../models/Profile.model";
 import { NextFunction, Request, Response } from "express";
 import dotenv from "dotenv";
 import { sign } from "jsonwebtoken";
+import ApiKeyModel from "../models/ApiKey.model";
 
 dotenv.config();
 
@@ -54,7 +56,7 @@ passport.use(
         userAccount.save();
         return done(null, {
           id: userAccount.user_id,
-          scopes: ["exchange", "profile", "funding", "wallet"],
+          scopes: ["exchange", "profile", "funding", "wallet", "apikey"],
         });
       }
       let userProfile = await ProfileModel.findOne({
@@ -77,11 +79,12 @@ passport.use(
         provider_account_id: profile.id,
         refresh_token: refreshToken,
         access_token: accessToken,
+        scopes: ["exchange", "profile", "funding", "wallet", "apikey"],
       });
       await newUserAccount.save();
       return done(null, {
         id: newUserAccount.user_id,
-        scopes: ["exchange", "profile", "funding", "wallet"],
+        scopes: newUserAccount.scopes,
       });
     }
   )
@@ -108,7 +111,7 @@ passport.use(
         userAccount.save();
         return done(null, {
           id: userAccount.user_id,
-          scopes: ["exchange", "profile", "funding", "wallet"],
+          scopes: userAccount.scopes,
         });
       }
       let userProfile = await ProfileModel.findOne({
@@ -131,11 +134,12 @@ passport.use(
         provider_account_id: profile.id,
         refresh_token: refreshToken,
         access_token: accessToken,
+        scopes: ["exchange", "profile", "funding", "wallet", "apikey"],
       });
       await newUserAccount.save();
       return done(null, {
         id: newUserAccount.user_id,
-        scopes: ["exchange", "profile", "funding", "wallet"],
+        scopes: newUserAccount.scopes,
       });
     }
   )
@@ -171,11 +175,38 @@ passport.use(
 
       return done(null, {
         id: userAccount.user_id,
-        scopes: ["exchange", "profile", "funding", "wallet"],
+        scopes: userAccount.scopes,
       });
     }
   )
 );
+
+passport.use("api", new ApiKeyStrategy(async (req, done) => {
+  const token = req.headers.authorization;
+
+  if (!token) {
+    return done(null, false);
+  }
+
+  if(!token.startsWith("API ")) {
+    return done(null, false);
+  }
+
+  const key = token.substring(4);
+
+  const apiKey = await ApiKeyModel.findOne({
+    key,
+  });
+
+  if (!apiKey) {
+    return done(null, false);
+  }
+
+  return done(null, {
+    id: apiKey.user_id,
+    scopes: apiKey.scopes,
+  });
+}))
 
 export default passport;
 
