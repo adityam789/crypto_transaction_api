@@ -9,7 +9,7 @@ export default class ApiKeyController {
   public async create(req: Request, res: Response, next: NextFunction) {
     const scopes = req.body.scopes.split(",").map((scope: string) => scope.trim());
     const user = req.user as Profile;
-    
+
     if(!scopes.every((scope: string) => allowedScopes.includes(scope))) {
       return res.status(400).json({
         success: false,

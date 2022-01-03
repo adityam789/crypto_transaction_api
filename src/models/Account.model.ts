@@ -42,6 +42,10 @@ const AccountSchema = new Schema<Account>({
     type: Date,
     required: false,
   },
+  scopes: {
+    type: [String],
+    required: true,
+  },
 });
 
 AccountSchema.methods.comparePassword = function (password: string) {

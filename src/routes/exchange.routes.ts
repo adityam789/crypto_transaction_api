@@ -2,30 +2,13 @@ import { Router, Request, Response, NextFunction } from "express";
 import passport from "passport";
 import ExchangeController from "../controllers/exchange.controller";
 import { verify } from "jsonwebtoken"
+import scopeHandler from "../middleware/scopes.middleware";
 
 const router = Router();
 
 const exchangeController = new ExchangeController();
 
 router.use(passport.authenticate("jwt", { session: false }));
-
-router.use((req: Request, res: Response, next: NextFunction) => {
-	const token = (req.headers.authorization as string).substring(7);
-	const decoded = verify(token, process.env.JWT_SECRET as string) as {
-		id: string;
-		scopes: string[];
-	};
-
-	if(decoded.scopes.includes("exchange")) {
-		next();
-	}	
-	else {
-		res.status(403).json({
-			success: false,
-			message: "Unauthorized. You do not have the required scopes.",
-		});
-	}
-});
 
 /**
  * @api {post} /exchange/buy Buy
@@ -42,7 +25,7 @@ router.use((req: Request, res: Response, next: NextFunction) => {
  * @apiSuccess {Transaction} success Transaction object
  * @apiError {Object} error Error object
  */
-router.post("/buy", exchangeController.buyOrder);
+router.post("/buy",scopeHandler("exchange.buy"), exchangeController.buyOrder);
 
 /**
  * @api {post} /exchange/sell Sell

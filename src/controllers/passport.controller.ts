@@ -56,7 +56,7 @@ passport.use(
         userAccount.save();
         return done(null, {
           id: userAccount.user_id,
-          scopes: ["exchange", "profile", "funding", "wallet", "apikey"],
+          scopes: userAccount.scopes,
         });
       }
       let userProfile = await ProfileModel.findOne({
