@@ -15,7 +15,10 @@ import ApiKeyModel from "../models/ApiKey.model";
 
 dotenv.config();
 
-const REDIRECT_URI = process.env.NODE_ENV === "production"? `https://${process.env.BASE_URL}`:`http://localhost:3000`;
+const REDIRECT_URI =
+  process.env.NODE_ENV === "production"
+    ? `https://${process.env.BASE_URL}`
+    : `http://localhost:3000`;
 
 passport.use(
   new JwtStrategy(
@@ -183,32 +186,35 @@ passport.use(
   )
 );
 
-passport.use("api", new ApiKeyStrategy(async (req, done) => {
-  const token = req.headers.authorization;
+passport.use(
+  "api",
+  new ApiKeyStrategy(async (req, done) => {
+    const token = req.headers.authorization;
 
-  if (!token) {
-    return done(null, false);
-  }
+    if (!token) {
+      return done(null, false);
+    }
 
-  if(!token.startsWith("API ")) {
-    return done(null, false);
-  }
+    if (!token.startsWith("API ")) {
+      return done(null, false);
+    }
 
-  const key = token.substring(4);
+    const key = token.substring(4);
 
-  const apiKey = await ApiKeyModel.findOne({
-    key,
-  });
+    const apiKey = await ApiKeyModel.findOne({
+      key,
+    });
 
-  if (!apiKey) {
-    return done(null, false);
-  }
+    if (!apiKey) {
+      return done(null, false);
+    }
 
-  return done(null, {
-    id: apiKey.user_id,
-    scopes: apiKey.scopes,
-  });
-}))
+    return done(null, {
+      id: apiKey.user_id,
+      scopes: apiKey.scopes,
+    });
+  })
+);
 
 export default passport;
 
@@ -232,6 +238,7 @@ export function passport_token_handler(
     process.env.JWT_SECRET as string,
     {
       expiresIn: "24h",
+      issuer: "api.crypto.adi.codes",
     }
   );
   res.json({ token });

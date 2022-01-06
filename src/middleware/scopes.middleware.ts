@@ -29,14 +29,16 @@ export default function scopeHandler(scopeAllowed: string) {
       // exchange.sell - scopesallowed [exchange, buy, x]
       // [1,1,0]
 
-      scopes.map((scope: string) => {
+      for (const scope of scopes) {
         if (scopeAllowed.startsWith(scope)) {
-          return next();
+          next();
+          return;
         }
-      });
-    } catch (error) {
+      }
+      throw new Error("Invalid scope");
+    } catch (error: any) {
       return res.status(401).json({
-        error: "Invalid token",
+        error: error.message,
       });
     }
   };
