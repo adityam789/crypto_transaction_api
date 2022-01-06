@@ -6,6 +6,7 @@ import pricingRoutes from "./pricing.routes";
 import profileRoutes from "./profile.routes";
 import walletRoutes from "./wallet.routes";
 import ApiKeyRoutes from "./ApiKey.routes";
+import adminRoutes from "./admin.routes";
 
 const routes = Router();
 
@@ -23,6 +24,7 @@ routes.use("/pricing", pricingRoutes);
 routes.use("/profile", profileRoutes);
 routes.use("/wallet", walletRoutes);
 routes.use("/apikey", ApiKeyRoutes);
+routes.use("/admin", adminRoutes)
 
 routes.all("*", (req: Request, res: Response, next: NextFunction) => {
   res.status(404).json({
