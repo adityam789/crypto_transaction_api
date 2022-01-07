@@ -17,11 +17,11 @@ export default class ExchangeService {
   ) {
     try{
       if (!wallet_id_to) {
-        const wallet_to = await this.walletService.createWallet(
+        const walletTo = await this.walletService.createWallet(
           wallet_id_with,
           coin_to_buy
         );
-        wallet_id_to = wallet_to._id.toString() as string;
+        wallet_id_to = walletTo._id.toString() as string;
       }
       const wallet_to = await WalletModel.findById(wallet_id_to);
       const wallet_from = await WalletModel.findById(wallet_id_with);
@@ -69,11 +69,11 @@ export default class ExchangeService {
     wallet_id_to?: string
   ) {
     if (!wallet_id_to) {
-      const wallet_to = await this.walletService.createWallet(
+      const walletTo = await this.walletService.createWallet(
         wallet_id_with,
         coin_to_recieve
       );
-      wallet_id_to = wallet_to._id as string;
+      wallet_id_to = walletTo._id as string;
     }
     const wallet_to = await WalletModel.findById(wallet_id_to);
     const wallet_from = await WalletModel.findById(wallet_id_with);
