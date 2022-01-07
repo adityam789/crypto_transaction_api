@@ -19,14 +19,29 @@ routes.use((req: Request, res: Response, next: NextFunction) => {
   );
   next();
 });
+
+routes.use((req: Request, res: Response, next: NextFunction) => {
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+  next();
+});
+
+routes.use((req: Request, res: Response, next: NextFunction) => {
+  if (!req.is("application/json")) {
+    return res.status(400).json({
+      error: "Invalid content type, expected application/json",
+    });
+  }
+  next();
+});
+
 routes.use("/auth", authRoutes);
 routes.use("/exchange", exchangeRoutes);
 routes.use("/pricing", pricingRoutes);
 routes.use("/profile", profileRoutes);
 routes.use("/wallet", walletRoutes);
 routes.use("/apikey", ApiKeyRoutes);
-routes.use("/admin", adminRoutes)
-routes.use("/", rootRoutes)
+routes.use("/admin", adminRoutes);
+routes.use("/", rootRoutes);
 
 routes.all("*", (req: Request, res: Response, next: NextFunction) => {
   res.status(404).json({
