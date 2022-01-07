@@ -25,9 +25,7 @@ export default class AuthController {
     const profile = await ProfileModel.findOne({ email });
 
     if (profile) {
-      return res.status(409).json({
-        message: "Email already exists",
-      });
+      return next({ code: 409, message: "Email already exists" });
     }
 
     const passwordErrors: string[] = [];
@@ -53,11 +51,7 @@ export default class AuthController {
     }
 
     if (passwordErrors.length > 0) {
-      return res.json({
-        success: false,
-        message:
-          "Password must contain the following: " + passwordErrors.join(", "),
-      });
+      return next({ code: 400, message: `Password must contain: ${passwordErrors.join(", ")}` });
     }
 
     const newProfile = new ProfileModel({
@@ -100,10 +94,7 @@ export default class AuthController {
         message: "User created successfully.",
       });
     } catch (err) {
-      return res.status(500).json({
-        success: false,
-        message: "Error occured while sending email",
-      });
+      return next({ code: 500, message: "Internal server error. Error sending email" });
     }
   }
 
@@ -115,17 +106,13 @@ export default class AuthController {
     });
 
     if (!verification) {
-      return res.status(401).json({
-        message: "Invalid token",
-      });
+      return next({ code: 404, message: "Verification token not found" });
     }
 
     const user = await ProfileModel.findById(verification.user);
 
     if (!user) {
-      return res.status(401).json({
-        message: "User not found",
-      });
+      return next({ code: 404, message: "User not found" });
     }
 
     user.email_verified = true;
@@ -143,9 +130,7 @@ export default class AuthController {
     const profile = await ProfileModel.findOne({ email });
 
     if (!profile) {
-      return res.status(404).json({
-        message: "Email not found",
-      });
+      return next({ code: 404, message: "Email not found" });
     }
 
     const verification = new VerificationModel({
@@ -180,14 +165,10 @@ export default class AuthController {
     });
 
     if (!verification) {
-      return res.status(401).json({
-        message: "Invalid token",
-      });
+      return next({ code: 404, message: "Verification token not found" });
     }
     if (!password) {
-      return res.status(400).json({
-        message: "Password is required",
-      });
+      return next({ code: 400, message: "Password is required" });
     }
 
     const passwordErrors: string[] = [];
@@ -213,11 +194,7 @@ export default class AuthController {
     }
 
     if (passwordErrors.length > 0) {
-      return res.json({
-        success: false,
-        message:
-          "Password must contain the following: " + passwordErrors.join(", "),
-      });
+      return next({ code: 400, message: `Password must contain: ${passwordErrors.join(", ")}` });
     }
 
     const user = await AccountModel.findOne({

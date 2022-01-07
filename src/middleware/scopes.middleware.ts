@@ -6,15 +6,11 @@ export default function scopeHandler(scopeAllowed: string) {
     const token = req.headers.authorization;
 
     if (!token) {
-      return res.status(401).json({
-        error: "No token provided",
-      });
+      return next({ status: 401, message: "Unauthorized" });
     }
 
     if (!token.startsWith("Bearer ")) {
-      return res.status(401).json({
-        error: "Invalid token",
-      });
+      return next({ status: 401, message: "Invalid token" });
     }
 
     const tokenArr = token.split(" ");
@@ -37,9 +33,7 @@ export default function scopeHandler(scopeAllowed: string) {
       }
       throw new Error("Invalid scope");
     } catch (error: any) {
-      return res.status(401).json({
-        error: error.message,
-      });
+      return next({ status: 401, message: error.message });
     }
   };
 }

@@ -224,9 +224,7 @@ export function passport_token_handler(
   next: NextFunction
 ) {
   if (!req.user) {
-    return res.status(401).json({
-      error: "Unauthorized",
-    });
+    return next({ status: 401, message: "Unauthorized" });
   }
 
   const user = req.user as { id: string; scopes: string[] };

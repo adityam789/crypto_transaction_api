@@ -7,35 +7,30 @@ const allowedScopes = ["exchange", "profile", "funding", "wallet"];
 
 export default class ApiKeyController {
   public async create(req: Request, res: Response, next: NextFunction) {
-    const scopes = req.body.scopes.split(",").map((scope: string) => scope.trim());
+    const scopes = req.body.scopes
+      .split(",")
+      .map((scope: string) => scope.trim());
     const user = req.user as Profile;
 
-    if(!scopes.every((scope: string) => allowedScopes.includes(scope))) {
-      return res.status(400).json({
-        success: false,
+    if (!scopes.every((scope: string) => allowedScopes.includes(scope))) {
+      return next({
         message: "Invalid scopes, Allowed scopes: " + allowedScopes.join(", "),
+        code: 400,
       });
     }
-
 
     const errors: string[] = [];
 
     if (!scopes) errors.push("scopes is required");
 
     if (errors.length > 0) {
-      return res.status(400).json({
-        success: false,
-        message: errors.join(", "),
-      });
+      return next({ message: errors.join(", "), code: 400 });
     }
 
-    if(Object.values(scopes).includes("apikey")) {
-      return res.status(400).json({
-        success: false,
-        message: "apikeys cannot generate apikeys",
-      });
+    if (Object.values(scopes).includes("apikey")) {
+      return next({ message: "apikey is not allowed", code: 400 });
     }
-    const apiKey = new ApiKeyModel({ user_id: user._id.toString(), scopes});
+    const apiKey = new ApiKeyModel({ user_id: user._id.toString(), scopes });
     await apiKey.save();
 
     res.json({
@@ -55,26 +50,17 @@ export default class ApiKeyController {
     if (!key_id) errors.push("key_id is required");
 
     if (errors.length > 0) {
-      return res.status(400).json({
-        success: false,
-        message: errors.join(", "),
-      });
+      return next({ message: errors.join(", "), code: 400 });
     }
 
     const apiKey = await ApiKeyModel.findById(key_id);
 
-    if(!apiKey) {
-      return res.status(404).json({
-        success: false,
-        message: "ApiKey not found",
-      });
+    if (!apiKey) {
+      return next({ message: "ApiKey not found", code: 401 });
     }
 
-    if(apiKey.user_id !== user._id.toString()) {
-      return res.status(401).json({
-        success: false,
-        message: "Unauthorized",
-      });
+    if (apiKey.user_id !== user._id.toString()) {
+      return next({ message: "Unauthorized", code: 401 });
     }
 
     apiKey.rollKey();
@@ -97,26 +83,17 @@ export default class ApiKeyController {
     if (!key_id) errors.push("key is required");
 
     if (errors.length > 0) {
-      return res.status(400).json({
-        success: false,
-        message: errors.join(", "),
-      });
+      return next({ message: errors.join(", "), code: 400 });
     }
 
     const apiKey = await ApiKeyModel.findById(key_id);
 
-    if(!apiKey) {
-      return res.status(404).json({
-        success: false,
-        message: "ApiKey not found",
-      });
+    if (!apiKey) {
+      return next({ message: "ApiKey not found", code: 401 });
     }
 
-    if(apiKey.user_id !== user._id.toString()) {
-      return res.status(401).json({
-        success: false,
-        message: "Unauthorized",
-      });
+    if (apiKey.user_id !== user._id.toString()) {
+      return next({ message: "Unauthorized", code: 401 });
     }
 
     await apiKey.remove();
@@ -132,18 +109,18 @@ export default class ApiKeyController {
 
     const errors: string[] = [];
 
-    const apiKey = await ApiKeyModel.find({
-      user_id: user._id.toString(),
-    }, {
-      key: 1,
-      scopes: 1,
-    }).sort({ created_at: -1 });
+    const apiKey = await ApiKeyModel.find(
+      {
+        user_id: user._id.toString(),
+      },
+      {
+        key: 1,
+        scopes: 1,
+      }
+    ).sort({ created_at: -1 });
 
     if (!apiKey) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid key",
-      });
+      return next({ message: "ApiKey not found", code: 401 });
     }
 
     res.json({
@@ -153,4 +130,3 @@ export default class ApiKeyController {
     });
   }
 }
-

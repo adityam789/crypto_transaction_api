@@ -8,7 +8,7 @@ const pricingService = new PricingService();
 
 export default class ExchangeController {
   public async buyOrder(req: Request, res: Response, next: NextFunction) {
-    try{
+    try {
       const wallet_id_with = req.body.wallet_id_with;
       const wallet_id_to = req.body.wallet_id_to;
       const coin_to_sell = req.body.coin_to_sell;
@@ -17,8 +17,8 @@ export default class ExchangeController {
       const coin_to_sell_amount = parseFloat(req.body.coin_to_sell_amount);
 
       if (coin_to_buy_amount && coin_to_sell_amount) {
-        return res.json({
-          success: false,
+        return next({
+          code: 400,
           message:
             "Too many parameters. Only mention either coin_to_buy_amount or coin_to_sell_amount.",
         });
@@ -34,26 +34,29 @@ export default class ExchangeController {
         errors.push("coin_to_buy_amount or coin_to_sell_amount is required");
 
       if (errors.length) {
-        return res.json({
-          success: false,
-          message: errors.join(", "),
-        });
+        return next({ code: 400, message: errors.join(", ") });
       }
 
       const amount =
         coin_to_buy_amount ||
-        parseFloat((await pricingService.getPricingFromCoinbase(coin_to_buy, coin_to_sell)).amount) *
-          coin_to_sell_amount;
+        parseFloat(
+          (
+            await pricingService.getPricingFromCoinbase(
+              coin_to_buy,
+              coin_to_sell
+            )
+          ).amount
+        ) * coin_to_sell_amount;
 
       console.log("AMOUNT", amount);
       exchangeService
         .buy(coin_to_sell, coin_to_buy, amount, wallet_id_with, wallet_id_to)
-        .then((data) => res.json(data)).catch((err) => {throw err});
-    } catch(err:any){
-      res.json({
-        success: false,
-        message: err.message,
-      });
+        .then((data) => res.json(data))
+        .catch((err) => {
+          throw err;
+        });
+    } catch (err: any) {
+      next({ code: 400, message: err.message });
     }
   }
 
@@ -68,19 +71,19 @@ export default class ExchangeController {
     const coin_to_sell_amount = parseFloat(req.params.coin_to_sell_amount);
 
     if (coin_to_recieve_amount && coin_to_sell_amount) {
-      return res.json({
-        success: false,
-        message:
-          "Too many parameters. Only mention either coin_to_recieve_amount or coin_to_sell_amount.",
-      });
+      return next({ code: 400, message: "Too many parameters, either send coin_to_receive_amount or coin_to_sell_amount" });
     }
 
     const amount =
       coin_to_sell_amount ||
-      parseFloat((await pricingService.getPricingFromCoinbase(
-        coin_to_sell,
-        coin_to_recieve
-      )).amount) * coin_to_recieve_amount;
+      parseFloat(
+        (
+          await pricingService.getPricingFromCoinbase(
+            coin_to_sell,
+            coin_to_recieve
+          )
+        ).amount
+      ) * coin_to_recieve_amount;
 
     exchangeService
       .sell(coin_to_recieve, coin_to_sell, amount, wallet_id_with, wallet_id_to)

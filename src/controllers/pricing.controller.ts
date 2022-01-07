@@ -13,7 +13,7 @@ export default class PricingController {
     pricingService
       .getPricingFromCoinbase(coin_1, coin_2)
       .then((pricing) => res.json(pricing))
-      .catch((error) => res.status(400).json(error));
+      .catch((error) => next({ code: 400, message: error.message }));
   }
 
   public getCandlestickData(req: Request, res: Response, next: NextFunction) {
@@ -25,6 +25,6 @@ export default class PricingController {
     pricingService
       .getCandlestickDataFromCoinbase(product_id, start, end, granularity)
       .then((data) => res.json(data))
-      .catch((error) => res.status(400).json(error));
+      .catch((error) => next({ code: 400, message: error.message }));
   }
 }

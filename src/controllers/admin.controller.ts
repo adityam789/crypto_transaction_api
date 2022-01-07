@@ -13,9 +13,7 @@ export default class AdminController {
       const user = await adminService.get_id_discord(discordId);
       return res.json(user);
     } catch (err: any) {
-      res.status(404).json({
-        error: err.message,
-      });
+      next({ message: err.message, code: 400 });
     }
   }
 }
