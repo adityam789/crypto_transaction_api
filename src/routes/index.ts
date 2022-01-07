@@ -24,22 +24,12 @@ routes.use("/pricing", pricingRoutes);
 routes.use("/profile", profileRoutes);
 routes.use("/wallet", walletRoutes);
 routes.use("/apikey", ApiKeyRoutes);
-routes.use("/admin", adminRoutes);
+routes.use("/admin", adminRoutes)
 
-routes.use(
-  (
-    error: { message: string; code: number } = {
-      message: "Route not found",
-      code: 404,
-    },
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
-    res.status(error.code).json({
-      message: error.message,
-    });
-  }
-);
+routes.all("*", (req: Request, res: Response, next: NextFunction) => {
+  res.status(404).json({
+    message: "Route not found",
+  });
+});
 
 export default routes;
