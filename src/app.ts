@@ -31,6 +31,6 @@ app.use(cookieParser(process.env.COOKIE_SECRET));
 app.use(express.urlencoded({ extended: true }));
 app.use(passport.initialize());
 
-app.use(routes);
+app.use(routes); 
 
 export default app;
