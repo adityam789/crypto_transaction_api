@@ -1,4 +1,4 @@
-# crypto_transaction_api
+# CryptoSimulator APIs
 
 This is a Back-end application to simulate crypto-currency trading utilizing coinbase API for real time exchange value
 It utilizes various login authentication methods with TFA and API-keys to maintain secure wallets for users
